@@ -9,6 +9,7 @@ describe('Sitemap generator', function() {
   var Post = hexo.model('Post');
   var generator = require('../lib/generator').bind(hexo);
   var sitemapTmpl = require('../lib/template')();
+  var util = require('../lib/util');
   var posts;
   var locals;
 
@@ -29,23 +30,14 @@ describe('Sitemap generator', function() {
     hexo.config.sitemap = {
       path: 'sitemap.xml'
     };
-    var _posts = posts.toArray();
+    var postsArray = posts.toArray();
     var result = generator(locals);
-
-    var alts = {};
-    for(var j = 0; j < _posts.length; j++) {
-      var thisPost = _posts[j];
-      alts[thisPost.path] = _posts.filter(function(post) {
-        post.lang = 'en';
-        return thisPost.path.indexOf(post.path) >= 0 ||
-          post.path.indexOf(thisPost.path) >= 0;
-      });
-    }
+    var alts = util.groupByAlternatives(postsArray);
 
     result.path.should.eql('sitemap.xml');
     result.data.should.eql(sitemapTmpl.render({
       config: hexo.config,
-      posts: posts.toArray(),
+      posts: postsArray,
       alts: alts
     }));
 
@@ -54,6 +46,32 @@ describe('Sitemap generator', function() {
     $('urlset').find('url').each(function(i) {
       $(this).children('loc').text().should.eql(posts.eq(i).permalink);
       $(this).children('lastmod').text().should.eql(posts.eq(i).updated.toISOString());
+    });
+  });
+
+  describe('with_priroties', function() {
+    it('matchs', function() {
+      hexo.config.sitemap.priorities = {
+        'bar.*': "1.0",
+        'foo': "0.8"
+      };
+      var result = generator(locals);
+
+      var $ = cheerio.load(result.data);
+      $('urlset').find('url').each(function(i) {
+        var priority;
+        var loc = $(this).children('loc').text();
+        if (loc.match('bar.*')) {
+          priority = '1.0';
+        }
+        else if (loc.match('foo')) {
+          priority = '0.8';
+        }
+        else {
+          priority = '0.1';
+        }
+        $(this).children('priority').text().should.eql(priority);
+      });
     });
   });
 

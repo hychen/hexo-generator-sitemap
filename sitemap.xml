@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  {% for post in posts %}
+  {% for post in posts -%}
   <url>
     <loc>{{ post.permalink | uriencode }}</loc>
-    {% if post.updated %}
+    {% if post.updated -%}
     <lastmod>{{ post.updated.toISOString() }}</lastmod>
-    {% elif post.date %}
+    {% elif post.date -%}
     <lastmod>{{ post.date.toISOString() }}</lastmod>
-    {% endif %}
-    {% for alt in alts[post.path] %}
+    {% endif -%}
+    {% if priorities[post.path] -%}
+    <priority>{{ priorities[post.path] }}</priority>
+    {% endif -%}
+    {% for alt in alts[post.path] -%}
     <xhtml:link rel="alternate" hreflang="{{alt.lang}}" href="{{alt.permalink | uriencode }}" />
-    {% endfor %}
+    {% endfor -%}
   </url>
   {% endfor %}
 </urlset>
