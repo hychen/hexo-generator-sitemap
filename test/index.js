@@ -29,13 +29,24 @@ describe('Sitemap generator', function() {
     hexo.config.sitemap = {
       path: 'sitemap.xml'
     };
-
+    var _posts = posts.toArray();
     var result = generator(locals);
+
+    var alts = {};
+    for(var j = 0; j < _posts.length; j++) {
+      var thisPost = _posts[j];
+      alts[thisPost.path] = _posts.filter(function(post) {
+        post.lang = 'en';
+        return thisPost.path.indexOf(post.path) >= 0 ||
+          post.path.indexOf(thisPost.path) >= 0;
+      });
+    }
 
     result.path.should.eql('sitemap.xml');
     result.data.should.eql(sitemapTmpl.render({
       config: hexo.config,
-      posts: posts.toArray()
+      posts: posts.toArray(),
+      alts: alts
     }));
 
     var $ = cheerio.load(result.data);
@@ -68,4 +79,5 @@ describe('Sitemap generator', function() {
       result.should.be.ok;
     });
   });
+
 });
