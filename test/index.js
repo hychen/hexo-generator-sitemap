@@ -60,10 +60,10 @@ describe('Sitemap generator', function() {
       $('urlset').find('url').each(function(i) {
         var priority;
         var loc = $(this).children('loc').text();
-        if (loc.match('bar.*')) {
+        if (loc.match(/bar.*/)) {
           priority = '1.0';
         }
-        else if (loc.match('foo')) {
+        else if (loc.match(/foo/)) {
           priority = '0.8';
         }
         else {
