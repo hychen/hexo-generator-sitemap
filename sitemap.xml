@@ -8,7 +8,9 @@
     {% elif post.date -%}
     <lastmod>{{ post.date.toISOString() }}</lastmod>
     {% endif -%}
-    {% if priorities[post.path] -%}
+    {% if post.isHome -%}
+    <priority>1.0</priority>
+    {% elif priorities[post.path] -%}
     <priority>{{ priorities[post.path] }}</priority>
     {% endif -%}
     {% for alt in alts[post.path] -%}
