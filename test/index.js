@@ -32,12 +32,11 @@ describe('Sitemap generator', function() {
     };
     var postsArray = posts.toArray();
     var result = generator(locals);
-    var alts = util.groupByAlternatives(postsArray);
-
+    var alts = util.groupByAlternatives(['en'], postsArray);
     result.path.should.eql('sitemap.xml');
     result.data.should.eql(sitemapTmpl.render({
       config: hexo.config,
-      posts: postsArray,
+      posts: postsArray.map(function(p) {p.lang ='en'; return p;}),
       alts: alts
     }));
 
@@ -98,4 +97,18 @@ describe('Sitemap generator', function() {
     });
   });
 
+  describe('isAlternativePost', function() {
+    it('matchs', function() {
+      var langs = ['en', 'zh-Hant-TW'];
+      var p1 = {path: 'index.html'};
+      var p2 = {path: 'zh-Hant-TW/index.html'};
+      util.isAlternative(langs, p1, p2).should.be.ok;
+      var p3 = {path: 'abc/index.html'};
+      var p4 = {path: 'zh-Hant-TW/abc/index.html'};
+      util.isAlternative(langs, p3, p4).should.be.ok;
+      var p5 = {path: 'abc/defg/index.html'};
+      var p6 = {path: 'zh-Hant-TW/abc/defg/index.html'};
+      util.isAlternative(langs, p5, p6).should.be.ok;
+    });
+  });
 });
