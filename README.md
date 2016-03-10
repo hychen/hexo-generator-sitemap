@@ -20,6 +20,12 @@ You can configure this plugin in `_config.yml`.
 ``` yaml
 sitemap:
     path: sitemap.xml
+    priorities:
+      "downloads/*": "1.0"
+      "docs/.*|tutorials/.*|roadmap/.*|pro/.*": "0.9"
 ```
 
 - **path** - Sitemap path. (Default: sitemap.xml)
+- **priorities** - Sitemap prirorty.
+  - key: the REGEX pattern urls matched.
+  - value: the priority number.
